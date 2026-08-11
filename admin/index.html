@@ -1,349 +1,551 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="scroll-smooth">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>時光房產 | 精選物件 & 最新文章</title>
-  <style>
-    /* --- 1. 全域樣式設定 --- */
-    :root {
-      --primary-color: #1d4ed8; /* 藍色 */
-      --secondary-color: #06c755; /* LINE 綠色 */
-      --text-color: #1f2937;
-      --bg-color: #f9fafb;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: var(--text-color);
-      background-color: var(--bg-color);
-      line-height: 1.6;
-      padding-top: 70px; /* 為固定導覽列預留空間，防止內容被遮擋 */
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-      transition: color 0.2s;
-    }
-
-    /* --- 2. 手機版頂部固定導覽列 (Sticky Header) --- */
-    .main-header {
-      position: fixed; /* 固定在頂部 */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 70px;
-      background-color: #ffffff;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      z-index: 1000; /* 確保選單在最上層 */
-      display: flex;
-      align-items: center;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-
-    /* 漢堡圖示 (預設電腦版隱藏) */
-    .hamburger-btn {
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 30px;
-      height: 21px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      z-index: 1001; /* 確保漢堡按鈕在側邊選單之上 */
-    }
-
-    .hamburger-btn .bar {
-      width: 100%;
-      height: 3px;
-      background-color: #334155;
-      border-radius: 2px;
-      transition: all 0.3s ease;
-    }
-
-    /* 選單連結區塊 (電腦版樣式) */
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-    }
-
-    .nav-link {
-      font-weight: 600;
-      font-size: 16px;
-      color: #334155;
-    }
-
-    .nav-link:hover {
-      color: var(--primary-color);
-    }
-
-    /* LINE 按鈕樣式 */
-    .line-nav-btn {
-      background-color: var(--secondary-color);
-      color: #ffffff !important;
-      padding: 8px 18px;
-      border-radius: 25px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(6, 199, 85, 0.3);
-    }
-
-    .line-nav-btn:hover {
-      background-color: #05b34c;
-    }
-
-    /* --- 📱 手機版 RWD 樣式 (螢幕 768px 以下) --- */
-    @media (max-width: 768px) {
-      .hamburger-btn {
-        display: flex; /* 手機版顯示漢堡按鈕 */
-      }
-
-      .nav-menu {
-        position: fixed;
-        top: 0;
-        right: -100%; /* 預設隱藏在螢幕右側外 */
-        width: 280px; /* 側邊選單寬度 */
-        height: 100vh; /* 滿版高度 */
-        background-color: #ffffff;
-        flex-direction: column; /* 連結垂直排列 */
-        align-items: flex-start;
-        padding: 100px 30px 30px; /* 預留頂部空間給漢堡按鈕 */
-        gap: 25px;
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-        transition: right 0.3s ease-in-out; /* 滑出動畫 */
-      }
-
-      /* 選單展開時狀態 */
-      .nav-menu.active {
-        right: 0;
-      }
-
-      .nav-link {
-        font-size: 18px;
-        width: 100%;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee; /* 增加分隔線 */
-      }
-
-      .line-nav-btn {
-        margin-top: 15px;
-        width: 100%;
-        justify-content: center; /* LINE 按鈕在手機版水平置中 */
-      }
-
-      /* 漢堡開關動畫 (變成 X) */
-      .hamburger-btn.active .bar:nth-child(1) {
-        transform: translateY(9px) rotate(45deg);
-      }
-      .hamburger-btn.active .bar:nth-child(2) {
-        opacity: 0;
-      }
-      .hamburger-btn.active .bar:nth-child(3) {
-        transform: translateY(-9px) rotate(-45deg);
-      }
-    }
-
-    /* --- 3. 頁面內容樣式 (物件列表範例) --- */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-
-    .section-title {
-      font-size: 28px;
-      margin-bottom: 30px;
-      color: #111827;
-      border-left: 5px solid var(--primary-color);
-      padding-left: 15px;
-    }
-
-    .properties-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 30px;
-    }
-
-    .property-card {
-      background: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .property-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .property-image {
-      width: 100%;
-      height: 200px;
-      background-color: #e5e7eb; /* 預設圖片背景色 */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #9ca3af;
-    }
-
-    .property-content {
-      padding: 20px;
-    }
-
-    .property-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #111827;
-    }
-
-    .property-info {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 15px;
-    }
-
-    .property-price {
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-
-  </style>
-</head>
-<body>
-
-  <!-- 手機與電腦通用：頂部固定導覽列 -->
-  <header class="main-header">
-    <div class="nav-container">
-      <a href="./" class="logo">時光房產</a>
-
-      <!-- 漢堡按鈕 (僅在手機版顯示) -->
-      <button class="hamburger-btn" id="hamburgerBtn" aria-label="切換選單">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-
-      <!-- 選單連結區塊 (手機版會滑出) -->
-      <nav class="nav-menu" id="navMenu">
-        <a href="./" class="nav-link">首頁</a>
-        <a href="#properties" class="nav-link">精選物件</a>
-        <a href="#posts" class="nav-link">最新文章</a>
-        
-        <!-- === 【重要】請將下面的 ID 替換為您的真實 LINE 官方帳號連結 === -->
-        <a href="https://line.me/ti/p/GzMOmMKQo4" target="_blank" class="nav-link line-nav-btn">
-          <!-- LINE Icon (SVG) -->
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.905 2.572-3.844 2.572-6.002z"/>
-          </svg>
-          LINE 諮詢
-        </a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- 頁面主要內容區域 -->
-  <main class="container">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業房產顧問 | 精選好房 & 不動產稅費試算</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- Marked.js 解析 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- 精選物件區塊 -->
-    <section id="properties">
-      <h2 class="section-title">精選物件</h2>
-      
-      <div class="properties-grid">
-        <!-- 物件範例 1 -->
-        <div class="property-card">
-          <div class="property-image">物件圖片</div>
-          <div class="property-content">
-            <div class="property-title">信義區景觀豪邸</div>
-            <div class="property-info">3房2廳 | 55坪 | 高樓層</div>
-            <div class="property-price">NT$ 8,800 萬</div>
-          </div>
-        </div>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                            gold: '#d97706'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.75) 100%), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        /* 文章 Markdown 樣式修飾 */
+        .prose p { margin-bottom: 1em; line-height: 1.7; }
+        .prose h1, .prose h2, .prose h3 { font-weight: bold; margin-top: 1.2em; margin-bottom: 0.6em; color: #1e293b; }
+        .prose h2 { font-size: 1.25rem; border-left: 4px solid #1d4ed8; padding-left: 0.5rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1em; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1em; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
 
-        <!-- 物件範例 2 -->
-        <div class="property-card">
-          <div class="property-image">物件圖片</div>
-          <div class="property-content">
-            <div class="property-title">大安區捷運精裝房</div>
-            <div class="property-info">2房1廳 | 28坪 | 捷運3分鐘</div>
-            <div class="property-price">NT$ 3,200 萬</div>
-          </div>
+    <!-- 頂部聯絡資訊條 -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800 hidden md:block">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <span><i class="fa-solid fa-phone text-amber-400 mr-2"></i>服務專線：0900-000-000</span>
+                <span><i class="fa-solid fa-location-dot text-amber-400 mr-2"></i>深耕在地 · 專業不動產服務</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span>營業員證號：(100) 登字第 000000 號</span>
+                <a href="/admin/" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-lock mr-1"></i>後台管理</a>
+            </div>
         </div>
-        
-        <!-- 物件範例 3 -->
-        <div class="property-card">
-          <div class="property-image">物件圖片</div>
-          <div class="property-content">
-            <div class="property-title">內湖區清幽別墅</div>
-            <div class="property-info">4房3廳 | 80坪 | 附雙車位</div>
-            <div class="property-price">NT$ 6,500 萬</div>
-          </div>
+    </div>
+
+    <!-- 導覽列 -->
+    <nav class="bg-white/95 backdrop-blur shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-brand-800 rounded-xl flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-house-chimney text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight text-slate-900 block leading-tight">專業房產顧問</span>
+                    <span class="text-xs text-slate-500 tracking-wider">REAL ESTATE CONSULTANT</span>
+                </div>
+            </a>
+            
+            <!-- 選單項目 -->
+            <div class="hidden md:flex items-center space-x-8 font-medium text-sm text-slate-600">
+                <a href="#about" class="hover:text-brand-600 transition">關於顧問</a>
+                <a href="#properties" class="hover:text-brand-600 transition">精選物件</a>
+                <a href="#articles" class="hover:text-brand-600 transition">房產觀點</a>
+                <a href="#process" class="hover:text-brand-600 transition">服務流程</a>
+                <a href="#tax-calculator" class="hover:text-brand-600 transition">稅費試算</a>
+                <a href="https://line.me" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-2">
+                    <i class="fa-brands fa-line text-lg"></i>
+                    <span>諮詢預約</span>
+                </a>
+            </div>
+
+            <!-- 手機版選單按鈕 -->
+            <a href="/admin/" class="md:hidden text-xs bg-slate-100 px-3 py-1.5 rounded-md font-medium text-slate-600">
+                管理後台
+            </a>
         </div>
-      </div>
+    </nav>
+
+    <!-- Hero 形象主區 -->
+    <section class="hero-bg text-white py-20 lg:py-32 px-4 shadow-inner">
+        <div class="max-w-5xl mx-auto text-center space-y-6">
+            <div class="inline-flex items-center space-x-2 bg-amber-500/20 border border-amber-400/30 text-amber-300 px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                <i class="fa-solid fa-award"></i>
+                <span>深耕在地 17 年 · 透明交易 · 嚴謹把關</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                尋找理想中的家，<br class="hidden sm:inline"><span class="text-amber-400">為您的不動產資產精密加值</span>
+            </h1>
+            <p class="text-slate-300 text-base md:text-lg max-w-2xl mx-auto font-light">
+                提供精準實價登錄行情分析、房地合一稅規劃、專業帶看與全流程代書產權保障服務。
+            </p>
+            <div class="pt-4 flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#properties" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>瀏覽精選物件</span>
+                </a>
+                <a href="#tax-calculator" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold px-8 py-3.5 rounded-xl backdrop-blur-sm transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-calculator text-amber-400"></i>
+                    <span>試算房地合一稅</span>
+                </a>
+            </div>
+
+            <!-- 數據統計 -->
+            <div class="pt-12 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 max-w-4xl mx-auto text-center">
+                <div>
+                    <div class="text-2xl md:text-3xl font-extrabold text-amber-400">17+</div>
+                    <div class="text-xs text-slate-300 mt-1">資深從業年資</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-extrabold text-amber-400">500+</div>
+                    <div class="text-xs text-slate-300 mt-1">成功成交案例</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-extrabold text-amber-400">100%</div>
+                    <div class="text-xs text-slate-300 mt-1">產權嚴格審查</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-extrabold text-amber-400">4.9★</div>
+                    <div class="text-xs text-slate-300 mt-1">客戶滿意度</div>
+                </div>
+            </div>
+        </div>
     </section>
 
-  </main>
+    <!-- 核心內容容器 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20 flex-grow">
 
-  <!-- 控制選單開關的 JavaScript -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      const navMenu = document.getElementById('navMenu');
-      const navLinks = document.querySelectorAll('.nav-link');
+        <!-- 顧問介紹區 -->
+        <section id="about" class="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-slate-100 flex flex-col md:flex-row gap-8 items-center">
+            <div class="w-full md:w-1/3 flex justify-center">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80" alt="房產顧問照片" class="rounded-2xl shadow-md w-64 h-80 object-cover border-4 border-white">
+                    <div class="absolute -bottom-4 -right-4 bg-brand-800 text-white p-3.5 rounded-xl shadow-lg text-center">
+                        <p class="text-xs text-slate-300">店長 / 顧問</p>
+                        <p class="font-bold text-sm">專業認證經紀人</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-2/3 space-y-4">
+                <span class="text-xs font-bold tracking-wider text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full">About Consultant</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900">秉持誠信與專業，為您把關每一筆交易</h2>
+                <p class="text-slate-600 leading-relaxed text-sm md:text-base">
+                    您好！我是您的專屬房產顧問。從業十多年來，我深知買賣房屋往往是人生中最重大的一筆決策。我們不只提供物件撮合，更致力於提供完整的市場趨勢解析、產權風險排查以及節稅資產規劃，讓您買得安心、賣得放心。
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div class="flex items-center space-x-2 text-sm text-slate-700">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span>實價登錄行情精準分析</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm text-slate-700">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span>履約保證安全交易</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm text-slate-700">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span>房地合一與重購退稅規劃</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm text-slate-700">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span>專屬客製化看屋服務</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      // 1. 點擊漢堡按鈕：切換選單展開/收合 (active class)
-      hamburgerBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 防止點擊事件傳遞到 document
-        hamburgerBtn.classList.toggle('active');
-        navMenu.classList.toggle('active');
-      });
+        <!-- 1. 精選物件展示區 -->
+        <section id="properties" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-200 pb-4">
+                <div>
+                    <span class="text-xs font-bold tracking-wider text-brand-600 uppercase">Featured Properties</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">精選優質物件</h2>
+                </div>
+                <p class="text-xs md:text-sm text-slate-500 mt-2 md:mt-0">資料由後台動態更新，提供最新屋況與資訊</p>
+            </div>
 
-      // 2. 點擊任意選單連結後：自動收合選單 (提升手機用戶體驗)
-      navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          hamburgerBtn.classList.remove('active');
-          navMenu.classList.remove('active');
-        });
-      });
+            <!-- 物件卡片容器 -->
+            <div id="property-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="col-span-full py-12 text-center text-slate-400">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>正在載入最新物件資料...</p>
+                </div>
+            </div>
+        </section>
 
-      // 3. 點擊頁面其他空白處：自動收合選單
-      document.addEventListener('click', (e) => {
-        if (!navMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-          hamburgerBtn.classList.remove('active');
-          navMenu.classList.remove('active');
+        <!-- 2. 房產知識與新聞資訊 -->
+        <section id="articles" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-200 pb-4">
+                <div>
+                    <span class="text-xs font-bold tracking-wider text-brand-600 uppercase">Real Estate Insights</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">房產觀點與市場新聞</h2>
+                </div>
+                <p class="text-xs md:text-sm text-slate-500 mt-2 md:mt-0">掌握稅務脈動、社區開箱與買房知識</p>
+            </div>
+
+            <!-- 文章卡片容器 -->
+            <div id="article-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="col-span-full py-12 text-center text-slate-400">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>正在載入知識文章...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 買賣服務流程 -->
+        <section id="process" class="space-y-8">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <span class="text-xs font-bold tracking-wider text-brand-600 uppercase">Service Workflow</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900">服務流程 透明標準</h2>
+                <p class="text-slate-500 text-sm">從諮詢到交屋，每一步都有專人貼心引導</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center space-y-3 relative">
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center font-bold text-lg mx-auto">1</div>
+                    <h3 class="font-bold text-slate-800">需求溝通與評估</h3>
+                    <p class="text-xs text-slate-500">瞭解購屋預算、地段偏好，或估算委託售屋的合理市場行情。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center space-y-3 relative">
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center font-bold text-lg mx-auto">2</div>
+                    <h3 class="font-bold text-slate-800">現場帶看與產檢</h3>
+                    <p class="text-xs text-slate-500">實地查看屋況，提供不動產說明書與環境優缺點客觀分析。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center space-y-3 relative">
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center font-bold text-lg mx-auto">3</div>
+                    <h3 class="font-bold text-slate-800">出價斡旋與簽約</h3>
+                    <p class="text-xs text-slate-500">協助價格溝通，由特約代書進行履約保證簽約保障款項安全。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center space-y-3 relative">
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center font-bold text-lg mx-auto">4</div>
+                    <h3 class="font-bold text-slate-800">完稅過戶與交屋</h3>
+                    <p class="text-xs text-slate-500">辦理房貸核撥、稅務申報，最後進行現場驗屋與順利交屋。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 房地合一稅 2.0 專業計算器 -->
+        <section id="tax-calculator" class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-100">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <div class="text-center space-y-2">
+                    <span class="text-xs font-bold tracking-wider text-amber-600 uppercase bg-amber-50 px-3 py-1 rounded-full">Tax Calculator</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900">房地合一稅 2.0 簡易試算</h2>
+                    <p class="text-xs md:text-sm text-slate-500">輸入買賣價格與持有時間，快速預估轉售稅額</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">預計出售價格 (萬元)</label>
+                        <input type="number" id="sellPrice" placeholder="例如：2000" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">原始買入價格 (萬元)</label>
+                        <input type="number" id="buyPrice" placeholder="例如：1500" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">取得與處分必要費用 (萬元)</label>
+                        <input type="number" id="costs" placeholder="留空預設以售價 3% 計算 (上限 30 萬)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">持有時間與稅率</label>
+                        <select id="years" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+                            <option value="0.45">持有 2 年以內 (稅率 45%)</option>
+                            <option value="0.35">超過 2 年，未滿 5 年 (稅率 35%)</option>
+                            <option value="0.20">超過 5 年，未滿 10 年 (稅率 20%)</option>
+                            <option value="0.15">超過 10 年 (稅率 15%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="calculateTax()" class="w-full bg-brand-800 hover:bg-brand-900 text-white font-bold py-3.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>立即計算應納稅額</span>
+                </button>
+
+                <!-- 計算結果顯示區域 -->
+                <div id="taxResult" class="p-6 bg-slate-900 text-white rounded-2xl hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span class="text-sm text-slate-400">預估課稅所得（淨利）：</span>
+                        <span id="netProfit" class="font-bold text-slate-200">0 萬</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span>預估應納房地合一稅：</span>
+                        <span id="taxAmount" class="text-amber-400 text-2xl">0 萬元</span>
+                    </div>
+                    <p class="text-xs text-slate-500 pt-2 border-t border-slate-800">
+                        * 註：試算結果僅供初步參考。自住滿 6 年享 400 萬免稅額與 10% 優惠稅率，或有重購退稅需求者，歡迎直接聯繫進行個案詳細規劃。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 文章/物件 完整閱讀 Modal 彈窗 -->
+    <div id="articleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            <!-- 標題與關閉按鈕 -->
+            <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50">
+                <div>
+                    <span id="modalCategory" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-md mb-2 inline-block">文章</span>
+                    <h3 id="modalTitle" class="text-xl font-bold text-slate-900 leading-tight"></h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <!-- 文章內文 -->
+            <div id="modalBody" class="p-6 overflow-y-auto prose max-w-none text-slate-700 text-sm md:text-base leading-relaxed">
+            </div>
+            <!-- 底部關閉按鈕 -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
+                <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2 rounded-lg text-sm transition">
+                    關閉視窗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-900 text-slate-400 pt-12 pb-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-3">
+                    <div class="text-white font-bold text-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-house-chimney text-amber-400"></i>
+                        <span>專屬房產顧問團隊</span>
+                    </div>
+                    <p class="text-xs leading-relaxed text-slate-400">
+                        用心服務每一個家庭，為您找到的不只是房屋，更是一輩子的安心與歸屬。
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-white text-sm font-bold">聯絡資訊</h4>
+                    <p class="text-xs"><i class="fa-solid fa-location-dot w-5 text-amber-400"></i>服務據點：台中市沙鹿區 / 在地經營</p>
+                    <p class="text-xs"><i class="fa-solid fa-phone w-5 text-amber-400"></i>諮詢專線：0900-000-000</p>
+                    <p class="text-xs"><i class="fa-solid fa-clock w-5 text-amber-400"></i>服務時間：週一至週日 09:00 - 21:00</p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-white text-sm font-bold">快捷連結</h4>
+                    <div class="flex flex-col space-y-1 text-xs">
+                        <a href="#properties" class="hover:text-white transition">精選物件</a>
+                        <a href="#articles" class="hover:text-white transition">房產知識與新聞</a>
+                        <a href="#tax-calculator" class="hover:text-white transition">房地合一稅試算</a>
+                        <a href="/admin/" class="hover:text-white transition">後台管理登入</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
+                <p>© 2026 專屬房產顧問團隊. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 右下角 LINE 懸浮按鈕 -->
+    <a href="https://line.me" target="_blank" class="fixed bottom-6 right-6 bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-full shadow-2xl transition-transform hover:scale-110 z-50 flex items-center space-x-2">
+        <i class="fa-brands fa-line text-2xl"></i>
+        <span class="hidden sm:inline font-bold text-sm pr-1">線上諮詢</span>
+    </a>
+
+    <!-- JavaScript 邏輯區 -->
+    <script>
+        // 全域儲存文章資料快取
+        const articleCache = {};
+
+        // 1. 稅費計算邏輯
+        function calculateTax() {
+            const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
+            let costsInput = parseFloat(document.getElementById('costs').value);
+            const taxRate = parseFloat(document.getElementById('years').value);
+
+            if (sell <= 0 || buy <= 0) {
+                alert('請輸入正確的預計出售與買入價格！');
+                return;
+            }
+
+            let costs = isNaN(costsInput) ? Math.min(sell * 0.03, 30) : costsInput;
+            const profit = sell - buy - costs;
+            const tax = profit > 0 ? profit * taxRate : 0;
+
+            document.getElementById('netProfit').innerText = (profit > 0 ? profit.toFixed(1) : '0') + ' 萬元';
+            document.getElementById('taxAmount').innerText = tax.toFixed(2) + ' 萬元';
+            document.getElementById('taxResult').classList.remove('hidden');
         }
-      });
-    });
-  </script>
 
+        // 2. 彈窗 Modal 開啟/關閉邏輯
+        function openArticleModal(id) {
+            const article = articleCache[id];
+            if (!article) return;
+
+            document.getElementById('modalCategory').innerText = article.type || '房產知識';
+            document.getElementById('modalTitle').innerText = article.title || '無標題';
+            document.getElementById('modalBody').innerHTML = marked.parse(article.body || '');
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 鎖定背景滾動
+        }
+
+        function closeModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+            document.body.style.overflow = ''; // 恢復滾動
+        }
+
+        // 3. 從 GitHub 自動讀取後台 Decap CMS 新增的物件與文章內容
+        const repoOwner = 'longlazy';
+        const repoName = 'long_long_ago';
+
+        async function fetchContent(folderPath, containerId, renderCard) {
+            const container = document.getElementById(containerId);
+            try {
+                const res = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`);
+                if (!res.ok) {
+                    container.innerHTML = '<p class="text-slate-400 col-span-full text-center py-8">目前尚無新增內容。</p>';
+                    return;
+                }
+                const files = await res.json();
+                container.innerHTML = '';
+
+                let hasValidContent = false;
+
+                for (let file of files) {
+                    if (file.name.endsWith('.md')) {
+                        const fileRes = await fetch(file.download_url);
+                        const text = await fileRes.text();
+                        
+                        const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+                        if (match) {
+                            const yamlText = match[1];
+                            const body = match[2];
+                            
+                            const metadata = {};
+                            yamlText.split('\n').forEach(line => {
+                                const [key, ...value] = line.split(':');
+                                if (key && value) {
+                                    metadata[key.trim()] = value.join(':').trim().replace(/^"|"$/g, '');
+                                }
+                            });
+
+                            const id = file.name.replace('.md', '');
+                            articleCache[id] = { ...metadata, body };
+
+                            container.innerHTML += renderCard(metadata, body, id);
+                            hasValidContent = true;
+                        }
+                    }
+                }
+
+                if (!hasValidContent) {
+                    container.innerHTML = '<p class="text-slate-400 col-span-full text-center py-8">尚無資料。</p>';
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<p class="text-slate-400 col-span-full text-center py-8">內容載入失敗。</p>';
+            }
+        }
+
+        // 渲染物件卡片 HTML
+        function renderPropertyCard(meta) {
+            return `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden card-hover flex flex-col justify-between">
+                    <div>
+                        <div class="relative">
+                            <img src="${meta.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600'}" class="w-full h-52 object-cover" alt="物件圖片">
+                            <span class="absolute top-3 left-3 bg-brand-800 text-white text-xs px-2.5 py-1 rounded-md font-bold shadow-sm">
+                                ${meta.category || '精選物件'}
+                            </span>
+                        </div>
+                        <div class="p-5 space-y-2">
+                            <h3 class="text-lg font-bold text-slate-900 line-clamp-1">${meta.title || '優質房產物件'}</h3>
+                            <p class="text-xs text-slate-500 flex items-center space-x-2">
+                                <i class="fa-solid fa-ruler-combined text-brand-600"></i>
+                                <span>${meta.specs || '歡迎來電洽詢詳細格局與坪數'}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0 flex justify-between items-center border-t border-slate-50 mt-4">
+                        <span class="text-xs text-slate-400">預售 / 總價</span>
+                        <div class="text-red-600 text-xl font-extrabold">${meta.price ? meta.price + ' <span class="text-xs font-normal">萬</span>' : '面議'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 渲染文章卡片 HTML（點擊跳出彈窗）
+        function renderArticleCard(meta, body, id) {
+            return `
+                <div onclick="openArticleModal('${id}')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between cursor-pointer group">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-md">
+                                ${meta.type || '房產知識'}
+                            </span>
+                            <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>最新發布</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 group-hover:text-brand-600 transition">${meta.title || '無標題'}</h3>
+                        <div class="text-slate-600 text-xs leading-relaxed line-clamp-3">
+                            ${marked.parse(body)}
+                        </div>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-50 text-right">
+                        <span class="text-xs font-bold text-brand-600 group-hover:text-brand-800 transition inline-flex items-center space-x-1">
+                            <span>閱讀完整內容</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 頁面載入後自動載入資料
+        window.onload = () => {
+            fetchContent('content/properties', 'property-list', renderPropertyCard);
+            fetchContent('content/posts', 'article-list', renderArticleCard);
+        };
+
+        // Identity 登入重新導向
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 </html>
