@@ -1,0 +1,33 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/images" # 上傳圖片時儲存的資料夾
+public_folder: "/assets/images"
+
+collections:
+  # 1. 物件廣告區設定
+  - name: "properties"
+    label: "物件廣告管理"
+    folder: "content/properties"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "物件名稱", name: "title", widget: "string" }
+      - { label: "總價 (萬元)", name: "price", widget: "number" }
+      - { label: "格局/坪數", name: "specs", widget: "string" }
+      - { label: "物件類別", name: "category", widget: "select", options: ["熱銷社區", "精選透天", "高投資報酬", "新上架"] }
+      - { label: "物件主圖", name: "image", widget: "image" }
+      - { label: "詳細介紹", name: "body", widget: "markdown" }
+
+  # 2. 文章/新聞/知識區設定
+  - name: "posts"
+    label: "新聞與知識文章"
+    folder: "content/posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "文章標題", name: "title", widget: "string" }
+      - { label: "分類", name: "type", widget: "select", options: ["新聞資訊", "不動產知識", "社區開箱"] }
+      - { label: "發布日期", name: "date", widget: "datetime" }
+      - { label: "文章內容", name: "body", widget: "markdown" }
