@@ -3,11 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>房產網站 Content Management System</title>
+  <title>房產後台內容管理系統</title>
+  <!-- Netlify Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* 頂部固定快速按鈕樣式 */
+    .view-site-btn {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      z-index: 99999;
+      background-color: #1d4ed8;
+      color: #ffffff !important;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .view-site-btn:hover {
+      background-color: #1e40af;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
 <body>
-  <!-- 載入 Decap CMS 管理介面 -->
+  <!-- 右上角頂部固定按鈕：點擊開新分頁連至前台 -->
+  <a href="https://longlazy.github.io/long_long_ago/" target="_blank" class="view-site-btn">
+    <span>瀏覽前台網站</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+      <polyline points="15 3 21 3 21 9"></polyline>
+      <line x1="10" y1="14" x2="21" y2="3"></line>
+    </svg>
+  </a>
+
+  <!-- 引入 Decap CMS 核心腳本 -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 </html>
