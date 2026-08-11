@@ -44,6 +44,12 @@
             transform: translateY(-6px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        /* 文章 Markdown 樣式修飾 */
+        .prose p { margin-bottom: 1em; line-height: 1.7; }
+        .prose h1, .prose h2, .prose h3 { font-weight: bold; margin-top: 1.2em; margin-bottom: 0.6em; color: #1e293b; }
+        .prose h2 { font-size: 1.25rem; border-left: 4px solid #1d4ed8; padding-left: 0.5rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1em; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1em; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
@@ -308,6 +314,31 @@
 
     </main>
 
+    <!-- 文章/物件 完整閱讀 Modal 彈窗 -->
+    <div id="articleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            <!-- 標題與關閉按鈕 -->
+            <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50">
+                <div>
+                    <span id="modalCategory" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-md mb-2 inline-block">文章</span>
+                    <h3 id="modalTitle" class="text-xl font-bold text-slate-900 leading-tight"></h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <!-- 文章內文 -->
+            <div id="modalBody" class="p-6 overflow-y-auto prose max-w-none text-slate-700 text-sm md:text-base leading-relaxed">
+            </div>
+            <!-- 底部關閉按鈕 -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
+                <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2 rounded-lg text-sm transition">
+                    關閉視窗
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 頁尾 -->
     <footer class="bg-slate-900 text-slate-400 pt-12 pb-8 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -352,6 +383,9 @@
 
     <!-- JavaScript 邏輯區 -->
     <script>
+        // 全域儲存文章資料快取
+        const articleCache = {};
+
         // 1. 稅費計算邏輯
         function calculateTax() {
             const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
@@ -364,9 +398,7 @@
                 return;
             }
 
-            // 若未輸入費用，預設帶售價 3%，上限 30 萬元
             let costs = isNaN(costsInput) ? Math.min(sell * 0.03, 30) : costsInput;
-
             const profit = sell - buy - costs;
             const tax = profit > 0 ? profit * taxRate : 0;
 
@@ -375,7 +407,24 @@
             document.getElementById('taxResult').classList.remove('hidden');
         }
 
-        // 2. 從 GitHub 自動讀取後台 Decap CMS 新增的物件與文章內容
+        // 2. 彈窗 Modal 開啟/關閉邏輯
+        function openArticleModal(id) {
+            const article = articleCache[id];
+            if (!article) return;
+
+            document.getElementById('modalCategory').innerText = article.type || '房產知識';
+            document.getElementById('modalTitle').innerText = article.title || '無標題';
+            document.getElementById('modalBody').innerHTML = marked.parse(article.body || '');
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 鎖定背景滾動
+        }
+
+        function closeModal() {
+            document.getElementById('articleModal').classList.add('hidden');
+            document.body.style.overflow = ''; // 恢復滾動
+        }
+
+        // 3. 從 GitHub 自動讀取後台 Decap CMS 新增的物件與文章內容
         const repoOwner = 'longlazy';
         const repoName = 'long_long_ago';
 
@@ -388,7 +437,7 @@
                     return;
                 }
                 const files = await res.json();
-                container.innerHTML = ''; // 清空載入中提示
+                container.innerHTML = '';
 
                 let hasValidContent = false;
 
@@ -397,7 +446,6 @@
                         const fileRes = await fetch(file.download_url);
                         const text = await fileRes.text();
                         
-                        // 解析 Markdown 的 Frontmatter (--- 內部的 YAML 標頭)
                         const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
                         if (match) {
                             const yamlText = match[1];
@@ -411,7 +459,10 @@
                                 }
                             });
 
-                            container.innerHTML += renderCard(metadata, body);
+                            const id = file.name.replace('.md', '');
+                            articleCache[id] = { ...metadata, body };
+
+                            container.innerHTML += renderCard(metadata, body, id);
                             hasValidContent = true;
                         }
                     }
@@ -453,10 +504,10 @@
             `;
         }
 
-        // 渲染文章卡片 HTML
-        function renderArticleCard(meta, body) {
+        // 渲染文章卡片 HTML（點擊跳出彈窗）
+        function renderArticleCard(meta, body, id) {
             return `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between">
+                <div onclick="openArticleModal('${id}')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-between cursor-pointer group">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-md">
@@ -464,13 +515,16 @@
                             </span>
                             <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>最新發布</span>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900">${meta.title || '無標題'}</h3>
+                        <h3 class="text-lg font-bold text-slate-900 group-hover:text-brand-600 transition">${meta.title || '無標題'}</h3>
                         <div class="text-slate-600 text-xs leading-relaxed line-clamp-3">
                             ${marked.parse(body)}
                         </div>
                     </div>
                     <div class="pt-4 mt-4 border-t border-slate-50 text-right">
-                        <span class="text-xs font-bold text-brand-600 hover:text-brand-800 cursor-pointer">閱讀完整內容 <i class="fa-solid fa-arrow-right text-xs"></i></span>
+                        <span class="text-xs font-bold text-brand-600 group-hover:text-brand-800 transition inline-flex items-center space-x-1">
+                            <span>閱讀完整內容</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </span>
                     </div>
                 </div>
             `;
