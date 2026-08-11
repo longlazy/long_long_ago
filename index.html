@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業不動產顧問服務網</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- 導覽列 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-blue-600">🏠 專屬房產顧問</div>
+            <div class="space-x-4 text-sm font-medium">
+                <a href="#properties" class="hover:text-blue-600">精選物件</a>
+                <a href="#articles" class="hover:text-blue-600">新聞與知識</a>
+                <a href="#tax-calculator" class="hover:text-blue-600">稅費試算</a>
+                <a href="/admin/" class="text-xs bg-gray-100 border px-2 py-1 rounded hover:bg-gray-200">管理後台</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主頁形象區 -->
+    <section class="bg-blue-900 text-white py-12 px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <h1 class="text-3xl font-bold mb-2">在地深耕 · 值得信賴的房產專家</h1>
+            <p class="text-blue-200 mb-6">提供透明資訊、專業稅費諮詢與優質物件代尋服務</p>
+            <a href="https://line.me/ti/p/GzMOmMKQo4" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow-lg inline-block transition">
+                💬 加 LINE 諮詢 / 預約看屋
+            </a>
+        </div>
+    </section>
+
+    <!-- 核心內容區 -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow space-y-12">
+        
+        <!-- 1. 精選物件區 -->
+        <section id="properties">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">精選物件展示</h2>
+            <div id="property-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 預設範例卡片（登入後台新增資料後可替換） -->
+                <div class="bg-white rounded-lg shadow border overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">熱銷社區</span>
+                        <h3 class="text-lg font-bold mt-2">市中心采風高樓採光三房</h3>
+                        <p class="text-gray-500 text-sm">3房2廳2衛 | 建坪 42.5 坪</p>
+                        <div class="text-red-600 text-xl font-bold mt-3">1,880 萬</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 新聞資訊 / 不動產知識 / 社區開箱 -->
+        <section id="articles">
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">房產知識與社區開箱</h2>
+            <div id="article-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-lg shadow border">
+                    <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-1 rounded">首購知識</span>
+                    <h3 class="text-lg font-bold mt-2">買房過戶有哪些隱藏費用？印花稅與契稅試算教學</h3>
+                    <p class="text-gray-500 text-sm mt-1">首購族在準備頭期款時，常忽略過戶手續費與代書費...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 房地合一稅試算區 -->
+        <section id="tax-calculator" class="bg-white p-6 rounded-lg shadow border">
+            <h2 class="text-2xl font-bold mb-4 border-l-4 border-blue-600 pl-3">房地合一稅 2.0 簡易試算</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">預計出售價格 (萬元)</label>
+                    <input type="number" id="sellPrice" placeholder="例如：2000" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">原始買入價格 (萬元)</label>
+                    <input type="number" id="buyPrice" placeholder="例如：1500" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">取得與處分必要費用 (萬元)</label>
+                    <input type="number" id="costs" placeholder="如仲介費、裝修費 (無輸入預設 3%)" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">持有時間</label>
+                    <select id="years" class="w-full p-2 border rounded">
+                        <option value="0.45">2 年內 (稅率 45%)</option>
+                        <option value="0.35">超過 2 年，未滿 5 年 (稅率 35%)</option>
+                        <option value="0.20">超過 5 年，未滿 10 年 (稅率 20%)</option>
+                        <option value="0.15">超過 10 年 (稅率 15%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="calculateTax()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition">
+                開始試算
+            </button>
+
+            <div id="taxResult" class="mt-4 p-4 bg-gray-50 rounded hidden border border-gray-200">
+                <p class="text-lg font-bold text-gray-700">預估房地合一稅：<span id="taxAmount" class="text-red-600 text-xl">0</span> 萬元</p>
+                <p class="text-xs text-gray-400 mt-1">* 試算結果僅供參考，實際應納稅額以稅捐稽徵機關核算為準。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾與右下角浮動 LINE 按鈕 -->
+    <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+        <p>© 專屬不動產經紀網站. All rights reserved.</p>
+    </footer>
+
+    <a href="https://line.me" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 transition flex items-center space-x-2">
+        <span>💬 聯絡我</span>
+    </a>
+
+    <!-- 稅費計算與 Netlify Identity 腳本 -->
+    <script>
+        function calculateTax() {
+            const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
+            let costs = parseFloat(document.getElementById('costs').value);
+            const taxRate = parseFloat(document.getElementById('years').value);
+
+            if (sell <= 0 || buy <= 0) {
+                alert('請輸入正確的出售與買入價格！');
+                return;
+            }
+            if (isNaN(costs)) costs = sell * 0.03;
+
+            const profit = sell - buy - costs;
+            const tax = profit > 0 ? profit * taxRate : 0;
+
+            document.getElementById('taxAmount').innerText = tax.toFixed(2);
+            document.getElementById('taxResult').classList.remove('hidden');
+        }
+
+        // 登入驗證重定向
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
