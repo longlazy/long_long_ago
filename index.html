@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專業不動產顧問服務網</title>
+    <title>專屬房產顧問網站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- 解析 Markdown 內容所需的輕量外掛 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
@@ -27,7 +29,7 @@
         <div class="max-w-3xl mx-auto">
             <h1 class="text-3xl font-bold mb-2">在地深耕 · 值得信賴的房產專家</h1>
             <p class="text-blue-200 mb-6">提供透明資訊、專業稅費諮詢與優質物件代尋服務</p>
-            <a href="https://line.me/ti/p/GzMOmMKQo4" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow-lg inline-block transition">
+            <a href="https://line.me" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow-lg inline-block transition">
                 💬 加 LINE 諮詢 / 預約看屋
             </a>
         </div>
@@ -36,32 +38,21 @@
     <!-- 核心內容區 -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow space-y-12">
         
-        <!-- 1. 精選物件區 -->
+        <!-- 1. 精選物件廣告區 -->
         <section id="properties">
             <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">精選物件展示</h2>
             <div id="property-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 預設範例卡片（登入後台新增資料後可替換） -->
-                <div class="bg-white rounded-lg shadow border overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">熱銷社區</span>
-                        <h3 class="text-lg font-bold mt-2">市中心采風高樓採光三房</h3>
-                        <p class="text-gray-500 text-sm">3房2廳2衛 | 建坪 42.5 坪</p>
-                        <div class="text-red-600 text-xl font-bold mt-3">1,880 萬</div>
-                    </div>
-                </div>
+                <!-- 動態載入物件卡片 -->
+                <p class="text-gray-400 col-span-3">物件載入中...</p>
             </div>
         </section>
 
         <!-- 2. 新聞資訊 / 不動產知識 / 社區開箱 -->
         <section id="articles">
-            <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">房產知識與社區開箱</h2>
+            <h2 class="text-2xl font-bold mb-6 border-l-4 border-blue-600 pl-3">房產知識與新聞資訊</h2>
             <div id="article-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-5 rounded-lg shadow border">
-                    <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-1 rounded">首購知識</span>
-                    <h3 class="text-lg font-bold mt-2">買房過戶有哪些隱藏費用？印花稅與契稅試算教學</h3>
-                    <p class="text-gray-500 text-sm mt-1">首購族在準備頭期款時，常忽略過戶手續費與代書費...</p>
-                </div>
+                <!-- 動態載入文章 -->
+                <p class="text-gray-400 col-span-2">文章載入中...</p>
             </div>
         </section>
 
@@ -104,7 +95,6 @@
 
     </main>
 
-    <!-- 頁尾與右下角浮動 LINE 按鈕 -->
     <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
         <p>© 專屬不動產經紀網站. All rights reserved.</p>
     </footer>
@@ -113,8 +103,8 @@
         <span>💬 聯絡我</span>
     </a>
 
-    <!-- 稅費計算與 Netlify Identity 腳本 -->
     <script>
+        // 1. 稅費試算邏輯
         function calculateTax() {
             const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
             const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
@@ -134,7 +124,84 @@
             document.getElementById('taxResult').classList.remove('hidden');
         }
 
-        // 登入驗證重定向
+        // 2. 從 GitHub 自動讀取後台新增的物件與文章內容
+        const repoOwner = 'longlazy';
+        const repoName = 'long_long_ago';
+
+        async function fetchContent(folderPath, containerId, renderCard) {
+            const container = document.getElementById(containerId);
+            try {
+                const res = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`);
+                if (!res.ok) {
+                    container.innerHTML = '<p class="text-gray-400 col-span-2">目前尚無新增內容。</p>';
+                    return;
+                }
+                const files = await res.json();
+                container.innerHTML = ''; // 清空載入中字樣
+
+                for (let file of files) {
+                    if (file.name.endsWith('.md')) {
+                        const fileRes = await fetch(file.download_url);
+                        const text = await fileRes.text();
+                        
+                        // 解析 Markdown 的 Frontmatter YAML 標頭
+                        const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+                        if (match) {
+                            const yamlText = match[1];
+                            const body = match[2];
+                            
+                            // 簡單解析 Key-Value
+                            const metadata = {};
+                            yamlText.split('\n').forEach(line => {
+                                const [key, ...value] = line.split(':');
+                                if (key && value) {
+                                    metadata[key.trim()] = value.join(':').trim().replace(/^"|"$/g, '');
+                                }
+                            });
+
+                            container.innerHTML += renderCard(metadata, body);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<p class="text-gray-400 col-span-2">內容載入失敗。</p>';
+            }
+        }
+
+        // 渲染物件卡片 HTML
+        function renderPropertyCard(meta) {
+            return `
+                <div class="bg-white rounded-lg shadow border overflow-hidden">
+                    <img src="${meta.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500'}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold">${meta.category || '精選物件'}</span>
+                        <h3 class="text-lg font-bold mt-2">${meta.title || '無標題'}</h3>
+                        <p class="text-gray-500 text-sm">${meta.specs || ''}</p>
+                        <div class="text-red-600 text-xl font-bold mt-3">${meta.price ? meta.price + ' 萬' : ''}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 渲染文章卡片 HTML
+        function renderArticleCard(meta, body) {
+            return `
+                <div class="bg-white p-5 rounded-lg shadow border">
+                    <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-1 rounded">${meta.type || '文章'}</span>
+                    <h3 class="text-lg font-bold mt-2">${meta.title || '無標題'}</h3>
+                    <div class="text-gray-600 text-sm mt-2 line-clamp-3">${marked.parse(body)}</div>
+                </div>
+            `;
+        }
+
+        // 頁面載入後自動執行抓取
+        window.onload = () => {
+            fetchContent('content/properties', 'property-list', renderPropertyCard);
+            fetchContent('content/posts', 'article-list', renderArticleCard);
+        };
+
+        // Identity 登入導向
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
                 if (!user) {
