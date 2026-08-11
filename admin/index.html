@@ -7,15 +7,37 @@
   <!-- Netlify Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
-    /* 頂部固定快速按鈕樣式 */
-    .view-site-btn {
+    /* 頂部工具列容器 */
+    .cms-top-toolbar {
       position: fixed;
       top: 10px;
-      right: 20px;
+      right: 15px;
       z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* 快速切換下拉選單 */
+    .mobile-collections-select {
+      background-color: #ffffff;
+      color: #1f2937;
+      border: 1.5px solid #d1d5db;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* 前台連結按鈕 */
+    .view-site-btn {
       background-color: #1d4ed8;
       color: #ffffff !important;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: bold;
@@ -23,27 +45,47 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.2s ease;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      white-space: nowrap;
     }
     .view-site-btn:hover {
       background-color: #1e40af;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       transform: translateY(-1px);
     }
+
+    /* 手機小螢幕自動縮小按鈕邊距與文字，確保不佔空間 */
+    @media (max-width: 640px) {
+      .view-site-btn span {
+        display: none; /* 手機上隱藏文字，只保留圖示 */
+      }
+      .view-site-btn {
+        padding: 6px 8px;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- 右上角頂部固定按鈕：點擊開新分頁連至前台 -->
-  <a href="https://gentle-otter-acd1d9.netlify.app/" target="_blank" class="view-site-btn">
-    <span>瀏覽前台網站</span>
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-      <polyline points="15 3 21 3 21 9"></polyline>
-      <line x1="10" y1="14" x2="21" y2="3"></line>
-    </svg>
-  </a>
+  <!-- 右上角頂部固定工具列 -->
+  <div class="cms-top-toolbar">
+    <!-- 手機/電腦通用快速選單：點選直接切換文章與物件 -->
+    <select class="mobile-collections-select" onchange="if(this.value) { window.location.hash = this.value; this.value = ''; }">
+      <option value="">快速跳轉...</option>
+      <option value="#/collections/posts">📝 文章列表</option>
+      <option value="#/collections/properties">🏠 物件列表</option>
+    </select>
+
+    <!-- 右上角開啟前台按鈕 -->
+    <a href="../" target="_blank" class="view-site-btn" title="瀏覽前台網站">
+      <span>瀏覽前台</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+    </a>
+  </div>
 
   <!-- 引入 Decap CMS 核心腳本 -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
